@@ -4,15 +4,16 @@ import time
 
 WIDTH = 640
 HEIGHT = 480
-screen = pygame.display.set_mode((WIDTH,HEIGHT), flags=pygame.FULLSCREEN | pygame.SCALED)
-BLACK = (0,0,0)
-WHITE = (255,255,255)
+screen = pygame.display.set_mode((WIDTH, HEIGHT), flags=pygame.FULLSCREEN
+                                 | pygame.SCALED)
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
 TEXT_SIZE = 36
 
 
 class Block:
 
-    def __init__(self, pos=(0,0),):
+    def __init__(self, pos=(0, 0), ):
         self.pos = pygame.Vector2(pos)
         self.width = 15
         self.height = 90
@@ -21,52 +22,58 @@ class Block:
         self.font = pygame.font.SysFont('arial', TEXT_SIZE)
 
         # Rect Controller
-        self.block_controller = pygame.Rect(pos[0], pos[1], self.width, self.height)
+        self.block_controller = pygame.Rect(pos[0], pos[1], self.width,
+                                            self.height)
         # Display Rect
-        self.block = pygame.draw.rect(screen, self.color, self.block_controller)
+        self.block = pygame.draw.rect(screen, self.color,
+                                      self.block_controller)
 
     def move(self, dir):
         self.pos = self.pos + dir * self.speed
 
-        self.block_controller = pygame.Rect(self.pos[0], self.pos[1], self.width, self.height)
+        self.block_controller = pygame.Rect(self.pos[0], self.pos[1],
+                                            self.width, self.height)
 
     def draw(self):
-        self.block = pygame.draw.rect(screen, self.color, self.block_controller)
+        self.block = pygame.draw.rect(screen, self.color,
+                                      self.block_controller)
 
     def score(self, score_text, pos):
         score_text = self.font.render(score_text, False, self.color)
-        screen.blit(score_text, (pos[0]- score_text.get_width()//2, 
-                                pos[1] - score_text.get_height()//2))
+        screen.blit(score_text, (pos[0] - score_text.get_width()//2,
+                                 pos[1] - score_text.get_height()//2))
 
-        
 
 class Ball:
-    
-    def __init__(self, pos=(0,0), speed=5.0):
+
+    def __init__(self, pos=(0, 0), speed=5.0):
         self.pos = pygame.Vector2(pos)
         self.size = 15
-        self.color = (255,255,255)
+        self.color = (255, 255, 255)
         self.x_dir = 1
         self.y_dir = -1
 
         # Ball Controller
-        self.block_controller = pygame.Rect(pos[0], pos[1], self.size, self.size)
+        self.block_controller = pygame.Rect(pos[0], pos[1], self.size,
+                                            self.size)
         # Display Ball
-        self.block = pygame.draw.rect(screen, self.color, self.block_controller)
+        self.block = pygame.draw.rect(screen, self.color,
+                                      self.block_controller)
 
     def move(self, speed):
         self.pos[0] += speed * self.x_dir
         self.pos[1] += speed * self.y_dir
 
-        self.block_controller = pygame.Rect(self.pos[0], self.pos[1], self.size, self.size)
+        self.block_controller = pygame.Rect(self.pos[0], self.pos[1],
+                                            self.size, self.size)
 
     def draw(self):
-        self.block = pygame.draw.rect(screen, self.color, self.block_controller)
+        self.block = pygame.draw.rect(screen, self.color,
+                                      self.block_controller)
 
     def reset(self):
         self.pos[0] = WIDTH//2
         self.pos[1] = HEIGHT//2
-        
 
 
 def main():
@@ -81,25 +88,24 @@ def main():
     point_sound = pygame.mixer.Sound("sfx/pong_point.wav")
     pygame.mixer.Sound.set_volume(hit_sound, volume)
     pygame.mixer.Sound.set_volume(point_sound, volume)
-    dt = 0
 
     # Window Title
     pygame.display.set_caption("PyBall: Retro Edition")
 
     # Create Player
-    player = Block(pos=(WIDTH//16,HEIGHT//2))
+    player = Block(pos=(WIDTH//16, HEIGHT//2))
+    player_score = 0
 
     # Create AI
     comp = Block(pos=(WIDTH - WIDTH//16 - player.width, HEIGHT//2))
+    comp_score = 0
 
     # Create Ball
     ball = Ball(pos=(WIDTH//2, HEIGHT//2))
 
-    def Default_Positions():
+    def default_positions():
         ball.reset()
         point_sound.play()
-
-
 
     # Game loop to keep the window open
     while True:
@@ -118,18 +124,19 @@ def main():
             player.move(pygame.Vector2(0, 1.5))
 
             # AI movement
-            if (comp.pos[1] <= ball.pos[1] and comp.pos[1] < HEIGHT-comp.height-2):
+            if (comp.pos[1] <= ball.pos[1] and comp.pos[1] <
+                    HEIGHT-comp.height-2):
                 comp.move(pygame.Vector2(0, 1.5))
                 # print("moving down")
             if (comp.pos[1] >= ball.pos[1] and comp.pos[1] > 2):
                 comp.move(pygame.Vector2(0, -1.5))
                 # print("moving up")
 
-
         # TODO: Fix ball collision glitch with player and comp
 
             # Player Block-hit detection
-            if pygame.Rect.colliderect(player.block_controller, ball.block_controller):
+            if pygame.Rect.colliderect(player.block_controller,
+                                       ball.block_controller):
                 ball.x_dir *= -1
                 if keys[pygame.K_UP]:
                     ball.y_dir = -1
@@ -138,7 +145,8 @@ def main():
                 hit_sound.play()
 
             # Comp Block-hit detection
-            if pygame.Rect.colliderect(comp.block_controller, ball.block_controller):
+            if pygame.Rect.colliderect(comp.block_controller,
+                                       ball.block_controller):
                 ball.x_dir *= -1
                 hit_sound.play()
 
@@ -146,13 +154,13 @@ def main():
             if ball.pos[1] <= 0 or ball.pos[1] >= HEIGHT - ball.size:
                 ball.y_dir *= -1
 
-        if ball.pos[0] >= WIDTH: # right wall detection
-            Default_Positions()
+        if ball.pos[0] >= WIDTH:  # right wall detection
+            default_positions()
             time.sleep(1)
             speed_multiplier = 2
             player_score += 1
-        elif ball.pos[0] <= 0 - ball.size: # left wall detection
-            Default_Positions()
+        elif ball.pos[0] <= 0 - ball.size:  # left wall detection
+            default_positions()
             time.sleep(1)
             speed_multiplier = 2
             comp_score += 1
@@ -169,9 +177,9 @@ def main():
         player.score(str(player_score), (WIDTH//4, HEIGHT//16))
         comp.score(str(comp_score), (WIDTH-WIDTH//4-TEXT_SIZE, HEIGHT//16))
 
-
         pygame.display.flip()
-        dt = clock.tick(60)
+        clock.tick(60)
+
 
 if __name__ == "__main__":
     main()
