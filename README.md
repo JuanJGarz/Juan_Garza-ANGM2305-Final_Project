@@ -13,7 +13,7 @@ displaying a winner and closing after the first person (or computer) wins three 
 - Sound effects for ball hits and scoring.
 
 ## Controls
-- Use the up and down arrow keys to control the player characters.
+- Use the up and down arrow keys to control the player character on the left.
 
 ## Demonstration Video
 - https://youtu.be/Wq5k9Pcj_qA
